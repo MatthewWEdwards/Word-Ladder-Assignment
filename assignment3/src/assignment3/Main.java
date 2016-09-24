@@ -28,7 +28,7 @@ import java.util.*;
 import java.io.*;
 
 public class Main {
-
+	//
 	// static variables and constants only here.
 
 	public static void main(String[] args) throws Exception {
