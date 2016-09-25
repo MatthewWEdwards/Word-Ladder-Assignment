@@ -125,10 +125,11 @@ public class Main {
 				dict.remove(currentChain.get(j));
 			}
 			
-			//TODO: fix issue with this loop creating arrays of the wrong size
 			for(int i = 0; i < wordLength; i++){
 				
 				//Find all valid next nodes, and test if the end is reached.
+				//TODO: change these capital letters to lowercase in the final version. short_dict.txt uses
+				//		uppercase letters, so thats why theses are uppercase.
 				for(char charChange = 'A'; charChange <= 'Z'; charChange++ ){
 					if(binString[i] == charChange){
 						continue;
