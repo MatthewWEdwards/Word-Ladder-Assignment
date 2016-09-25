@@ -46,7 +46,7 @@ public class Main {
 			kb = new Scanner(System.in);// default from Stdin
 			ps = System.out;			// default to Stdout
 		}
-		getWordLadderBFS("HEARD", "WEARS");
+		getWordLadderBFS("seats", "money");
 		initialize();
 		
 		// TODO methods to read in words, output ladder
@@ -113,24 +113,24 @@ public class Main {
 		
 		//initialize nodeLists
 		ArrayList <String> first = new ArrayList<String>();
-		first.add(start);
+		first.add(start.toUpperCase());
 		nodeLists.add(first);
-	
+		dict.remove(start);
+		
 		while(nodeLists.size() > 0){
-			currentChain = nodeLists.remove(0);
-			binString = currentChain.get(currentChain.size() - 1).toCharArray();
+			currentChain = nodeLists.remove(0); // pop nodeLists
+			binString = (currentChain.get(currentChain.size() - 1)).toUpperCase().toCharArray();
 			
-			//Temporarily remove items in the current chain to prevent duplicates.
+			//Remove items in current chain
+			//TODO: make this more efficient
 			for(int j = 0; j < currentChain.size(); j++){
 				dict.remove(currentChain.get(j));
 			}
 			
+			//Find all adjacent, and test if the end is reached.
 			for(int i = 0; i < wordLength; i++){
-				
-				//Find all valid next nodes, and test if the end is reached.
-				//TODO: change these capital letters to lowercase in the final version. short_dict.txt uses
-				//		uppercase letters, so thats why theses are uppercase.
 				for(char charChange = 'A'; charChange <= 'Z'; charChange++ ){
+					//test for the case when iterating when binString is not changed
 					if(binString[i] == charChange){
 						continue;
 					}
@@ -140,21 +140,18 @@ public class Main {
 					String test = new String(binString);
 					
 					if(dict.contains(test) == true){
-						
 						currentChain.add(test);
 						
-						if(test.equals(end)){
+						//Test for end
+						if(test.equals(end.toUpperCase())){
 							return currentChain;
 						}
 						
-						addChain = new ArrayList<String>(currentChain); //Chain to be added as a new node
+						//Add string to chain, and prepare currentChain for reuse.
+						addChain = new ArrayList<String>(currentChain);
 						nodeLists.add(addChain);
-						currentChain.remove(currentChain.size() -1); // prepare currentChain for reuse
+						currentChain.remove(currentChain.size() -1);
 					
-						//Return the chain items to the dictionary
-						for(int j = 0; j < currentChain.size() - 1; j++){
-							dict.add(currentChain.get(j));
-						}
 					}
 					
 					binString[i] = replacedChar;
@@ -162,7 +159,14 @@ public class Main {
 				}
 			}
 			
-			
+			//Remove analyzed node from dict
+			//TODO: analyze if this is redundent
+			String remove = new String(binString);
+			if(!dict.contains(remove)){
+				int temp = dict.size();
+				temp = temp + 0;
+			}
+			dict.remove(remove.toLowerCase());
 			
 
 		}
@@ -176,7 +180,7 @@ public class Main {
 		Set<String> words = new HashSet<String>();
 		Scanner infile = null;
 		try {
-			infile = new Scanner(new File("short_dict.txt"));
+			infile = new Scanner(new File("five_letter_words.txt"));
 		} catch (FileNotFoundException e) {
 			System.out.println("Dictionary File not Found!");
 			e.printStackTrace();
