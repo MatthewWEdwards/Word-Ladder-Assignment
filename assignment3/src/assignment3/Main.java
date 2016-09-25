@@ -28,6 +28,9 @@ import java.util.*;
 import java.io.*;
 
 public class Main {
+	private static boolean flagDFS;
+	private static Set<String> dictDFS;
+	private static ArrayList<String> ladderDFS;
 	public static int wordLength = 5; // length of words the world ladder is constructing from
 
 	public static void main(String[] args) throws Exception {
@@ -46,6 +49,8 @@ public class Main {
 			kb = new Scanner(System.in);// default from Stdin
 			ps = System.out;			// default to Stdout
 		}
+		flagDFS = true;
+		getWordLadderDFS("smart", "money");
 		getWordLadderBFS("seats", "money");
 		initialize();
 		
@@ -80,13 +85,37 @@ public class Main {
 	}
 
 	public static ArrayList<String> getWordLadderDFS(String start, String end) {
-
-		// Returned list should be ordered start to end. Include start and end.
-		// Return empty list if no ladder.
-		// TODO some code
-
-		Set<String> dict = makeDictionary();
-
+		
+		char[] binString = new char[wordLength];
+		binString = start.toCharArray();
+		char replacedChar;
+		
+		for(int i = 0; i < wordLength; i++){
+			for(char charChange = 'A'; charChange <= 'Z'; charChange++ ){
+				//test for the case when iterating when binString is not changed
+				if(binString[i] == charChange){
+					continue;
+				}
+				
+				replacedChar = binString[i];
+				binString[i] = charChange;
+				String test = new String(binString);
+				
+				if(dictDFS.contains(test) == true){
+					if(test == end){
+						ladderDFS.add(0, test);
+						return ladderDFS;
+					}
+					(getWordLadderDFS(test, end)).add(test);
+					
+				}
+				
+				binString[i] = replacedChar;
+				
+			}
+		}
+		
+		getWordLadderDFS("smart", "money");
 		// TODO more code
 
 		return null; // replace this line later with real return
