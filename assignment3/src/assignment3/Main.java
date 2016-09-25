@@ -28,8 +28,7 @@ import java.util.*;
 import java.io.*;
 
 public class Main {
-	//
-	// static variables and constants only here.
+	public static int wordLength = 5; // length of words the world ladder is constructing from
 
 	public static void main(String[] args) throws Exception {
 		
@@ -47,6 +46,7 @@ public class Main {
 			kb = new Scanner(System.in);// default from Stdin
 			ps = System.out;			// default to Stdout
 		}
+		getWordLadderBFS("HEARD", "WEARS");
 		initialize();
 		
 		// TODO methods to read in words, output ladder
@@ -94,9 +94,79 @@ public class Main {
 
 	public static ArrayList<String> getWordLadderBFS(String start, String end) {
 
-		// TODO some code
+		ArrayList <String> currentChain = new ArrayList<String>();
+		ArrayList <String> addChain = new ArrayList<String>(); // need to work on the use of this
+		ArrayList <ArrayList<String>> nodeLists = new ArrayList<ArrayList<String>>();
+		
+		//TODO: initialize ArrayLists to size = 0
+		
+		char[] binString = new char[wordLength];
+		char replacedChar;
+		
+		//Generate dictionary
 		Set<String> dict = makeDictionary();
-		// TODO more code
+		
+		//test for trivial case
+		if(start == end){
+			return currentChain;
+		}
+		
+		//initialize nodeLists
+		ArrayList <String> first = new ArrayList<String>();
+		first.add(start);
+		nodeLists.add(first);
+	
+		while(nodeLists.size() > 0){
+			currentChain = nodeLists.remove(0);
+			binString = currentChain.get(currentChain.size() - 1).toCharArray();
+			
+			//Temporarily remove items in the current chain to prevent duplicates.
+			for(int j = 0; j < currentChain.size(); j++){
+				dict.remove(currentChain.get(j));
+			}
+			
+			//TODO: fix issue with this loop creating arrays of the wrong size
+			for(int i = 0; i < wordLength; i++){
+				
+				//Find all valid next nodes, and test if the end is reached.
+				for(char charChange = 'A'; charChange <= 'Z'; charChange++ ){
+					if(binString[i] == charChange){
+						continue;
+					}
+					
+					replacedChar = binString[i];
+					binString[i] = charChange;
+					String test = new String(binString);
+					
+					if(dict.contains(test) == true){
+						
+						currentChain.add(test);
+						
+						if(test.equals(end)){
+							return currentChain;
+						}
+						
+						addChain = new ArrayList<String>(currentChain); //Chain to be added as a new node
+						nodeLists.add(addChain);
+						currentChain.remove(currentChain.size() -1); // prepare currentChain for reuse
+					
+						//Return the chain items to the dictionary
+						for(int j = 0; j < currentChain.size() - 1; j++){
+							dict.add(currentChain.get(j));
+						}
+					}
+					
+					binString[i] = replacedChar;
+					
+				}
+			}
+			
+			
+			
+
+		}
+		
+	
 		return null; // replace this line later with real return
 	}
 
@@ -105,7 +175,7 @@ public class Main {
 		Set<String> words = new HashSet<String>();
 		Scanner infile = null;
 		try {
-			infile = new Scanner(new File("five_letter_words.txt"));
+			infile = new Scanner(new File("short_dict.txt"));
 		} catch (FileNotFoundException e) {
 			System.out.println("Dictionary File not Found!");
 			e.printStackTrace();
