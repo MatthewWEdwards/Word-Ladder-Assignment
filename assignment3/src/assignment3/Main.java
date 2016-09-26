@@ -52,9 +52,9 @@ public class Main {
 		
 		initialize();
 		ArrayList<String> test = new ArrayList<String>();
-		test = getWordLadderDFS("SMART", "SMEAR");
-		getWordLadderBFS("SMART", "MONEY");
-
+		test = getWordLadderDFS("QQQQQ", "MONEY");
+		test = getWordLadderBFS("QQQQQ", "MONEY");
+		test.size();
 		
 		// TODO methods to read in words, output ladder
 	}
@@ -92,7 +92,8 @@ public class Main {
 	}
 
 	public static ArrayList<String> getWordLadderDFS(String start, String end) {
-		
+		//The returned array is currently in reverse order.
+		//Also there are some trailing nulls strings for some reason
 
 		char[] binString = new char[wordLength];
 		binString = start.toCharArray();
@@ -101,6 +102,12 @@ public class Main {
 		//flagDFS represents if the end has been found
 		if(flagDFS == true){
 			flagDFS = false;
+		}
+		
+		//Test for trivial case
+		if(start.equals(end)){
+			ladderDFS.add(start);
+			return ladderDFS;
 		}
 		
 		
@@ -120,33 +127,24 @@ public class Main {
 					String test = new String(binString);
 					
 					if(dictDFS.contains(test) == true){
-						if(test.equals(end)){
+						if(test.equals(end)){	
 							ladderDFS.add(0, test);
 							flagDFS = true;
 							return ladderDFS;
 						}
-						(getWordLadderDFS(test, end)).add(test);
+						ladderDFS = (getWordLadderDFS(test, end));
 						if(flagDFS){
-							return ladderDFS;
-						} 
-						
-						
+							ladderDFS.add(test);
+							return (ladderDFS);
+						} else{
+							dictDFS.remove(test);	//remove dead node from dictionary
+						}
 					}
-					
-					binString[i] = replacedChar;
-					
+					binString[i] = replacedChar;	//Prepare binString for further modification
 				}
-			}
-	
-			dictDFS.add(start);					//Bring dead end node back into dictionary
-			if(ladderDFS.contains(start)){ 		//Test if node is a dead end, and remove node if this is the case
-				ladderDFS.remove(ladderDFS.size() - 1);
 			}
 			return ladderDFS;
 		}
-		
-		///getWordLadderDFS("smart", "money");
-		// TODO more code
 
 	}
 
