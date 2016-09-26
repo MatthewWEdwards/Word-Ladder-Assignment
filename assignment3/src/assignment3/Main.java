@@ -31,7 +31,7 @@ public class Main {
 	private static boolean flagDFS;
 	private static Set<String> dictDFS;
 	private static ArrayList<String> ladderDFS;
-	public static int wordLength = 5; // length of words the world ladder is constructing from
+	public static int wordLength; // length of words the world ladder is constructing from
 
 	public static void main(String[] args) throws Exception {
 		
@@ -49,10 +49,12 @@ public class Main {
 			kb = new Scanner(System.in);// default from Stdin
 			ps = System.out;			// default to Stdout
 		}
-		flagDFS = true;
-		getWordLadderDFS("smart", "money");
-		getWordLadderBFS("seats", "money");
+		
 		initialize();
+		ArrayList<String> test = new ArrayList<String>();
+		test = getWordLadderDFS("SMART", "SMEAR");
+		getWordLadderBFS("SMART", "MONEY");
+
 		
 		// TODO methods to read in words, output ladder
 	}
@@ -63,6 +65,11 @@ public class Main {
 		// We will call this method before running our JUNIT tests. So call it
 
 		// only once at the start of main.
+		
+		dictDFS = makeDictionary();
+		ladderDFS = new ArrayList<String>();
+		flagDFS = false;
+		wordLength = 5;
 	}
 
 	/**
@@ -86,39 +93,61 @@ public class Main {
 
 	public static ArrayList<String> getWordLadderDFS(String start, String end) {
 		
+
 		char[] binString = new char[wordLength];
 		binString = start.toCharArray();
 		char replacedChar;
 		
-		for(int i = 0; i < wordLength; i++){
-			for(char charChange = 'A'; charChange <= 'Z'; charChange++ ){
-				//test for the case when iterating when binString is not changed
-				if(binString[i] == charChange){
-					continue;
-				}
-				
-				replacedChar = binString[i];
-				binString[i] = charChange;
-				String test = new String(binString);
-				
-				if(dictDFS.contains(test) == true){
-					if(test == end){
-						ladderDFS.add(0, test);
-						return ladderDFS;
-					}
-					(getWordLadderDFS(test, end)).add(test);
-					
-				}
-				
-				binString[i] = replacedChar;
-				
-			}
+		//flagDFS represents if the end has been found
+		if(flagDFS == true){
+			flagDFS = false;
 		}
 		
-		getWordLadderDFS("smart", "money");
+		
+		//Remove current string from dictionary
+		dictDFS.remove(start);
+		
+		while(true){
+			for(int i = 0; i < wordLength; i++){
+				for(char charChange = 'A'; charChange <= 'Z'; charChange++ ){
+					//test for the case when iterating when binString is not changed
+					if(binString[i] == charChange){
+						continue;
+					}
+					
+					replacedChar = binString[i];
+					binString[i] = charChange;
+					String test = new String(binString);
+					
+					if(dictDFS.contains(test) == true){
+						if(test.equals(end)){
+							ladderDFS.add(0, test);
+							flagDFS = true;
+							return ladderDFS;
+						}
+						(getWordLadderDFS(test, end)).add(test);
+						if(flagDFS){
+							return ladderDFS;
+						} 
+						
+						
+					}
+					
+					binString[i] = replacedChar;
+					
+				}
+			}
+	
+			dictDFS.add(start);					//Bring dead end node back into dictionary
+			if(ladderDFS.contains(start)){ 		//Test if node is a dead end, and remove node if this is the case
+				ladderDFS.remove(ladderDFS.size() - 1);
+			}
+			return ladderDFS;
+		}
+		
+		///getWordLadderDFS("smart", "money");
 		// TODO more code
 
-		return null; // replace this line later with real return
 	}
 
 	public static ArrayList<String> getWordLadderBFS(String start, String end) {
