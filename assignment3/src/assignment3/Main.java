@@ -29,6 +29,8 @@ import java.io.*;
 
 public class Main {
 	private static boolean flagDFS;
+	private static boolean firstCallDFS;
+	private static String firstStringDFS;
 	private static Set<String> dictDFS;
 	private static ArrayList<String> ladderDFS;
 	public static int wordLength; // length of words the world ladder is constructing from
@@ -52,8 +54,8 @@ public class Main {
 		
 		initialize();
 		ArrayList<String> test = new ArrayList<String>();
-		test = getWordLadderDFS("QQQQQ", "MONEY");
-		test = getWordLadderBFS("QQQQQ", "MONEY");
+		test = getWordLadderDFS("PEACH", "FRAME");
+		test = getWordLadderBFS("PEACH", "FRAME");
 		test.size();
 		
 		// TODO methods to read in words, output ladder
@@ -69,6 +71,8 @@ public class Main {
 		dictDFS = makeDictionary();
 		ladderDFS = new ArrayList<String>();
 		flagDFS = false;
+		firstCallDFS = true;
+		firstStringDFS = null;
 		wordLength = 5;
 	}
 
@@ -104,6 +108,13 @@ public class Main {
 			flagDFS = false;
 		}
 		
+		if(firstCallDFS == true){
+			dictDFS = makeDictionary();
+			firstStringDFS = start;
+			firstCallDFS = false;
+		}
+		
+		
 		//Test for trivial case
 		if(start.equals(end)){
 			ladderDFS.add(start);
@@ -114,9 +125,11 @@ public class Main {
 		//Remove current string from dictionary
 		dictDFS.remove(start);
 		
+		//Generate List
 		while(true){
 			for(int i = 0; i < wordLength; i++){
 				for(char charChange = 'A'; charChange <= 'Z'; charChange++ ){
+					
 					//test for the case when iterating when binString is not changed
 					if(binString[i] == charChange){
 						continue;
@@ -133,15 +146,79 @@ public class Main {
 							return ladderDFS;
 						}
 						ladderDFS = (getWordLadderDFS(test, end));
+
 						if(flagDFS){
+							if(firstStringDFS.equals(start)){ // test for end of list
+								ladderDFS.add(test);
+								ladderDFS.add(start);
+								charChange = 'Z'+1;			 //exit for loops
+								i = wordLength;
+								break;
+							}
 							ladderDFS.add(test);
 							return (ladderDFS);
-						} else{
+						} 
+						else{
 							dictDFS.remove(test);	//remove dead node from dictionary
 						}
+						
 					}
 					binString[i] = replacedChar;	//Prepare binString for further modification
 				}
+			}
+			
+			
+			
+			
+			if(flagDFS){
+				//Manage end of DFS
+				
+				//Remove trailing nulls
+				int k = ladderDFS.size() - 1;
+				while(ladderDFS.get(k) == null){
+					ladderDFS.remove(k);
+					k--;
+				}
+				
+				//Put list in proper order
+				ArrayList <String> reverseDFS = new ArrayList<String>();
+				for(int j = ladderDFS.size() - 1; j >= 0; j--){
+					reverseDFS.add(ladderDFS.get(j));
+				}
+				
+				//remove redundant stuff from node list
+	
+				for(int listIndex = 0; listIndex < reverseDFS.size()-1; listIndex++){
+					int finalRemoveIndex = listIndex + 2;//This line prevents the remove loop from functioning if no remove index is found
+					for(int redundantIndex = listIndex + 1; redundantIndex < reverseDFS.size()-1; redundantIndex++){
+						for(int i = 0; i < wordLength; i++){
+							for(char charChange = 'A'; charChange <= 'Z'; charChange++ ){
+								
+								binString = reverseDFS.get(redundantIndex).toCharArray();
+								if(binString[i] == charChange){
+									continue;
+								}
+								
+								replacedChar = binString[i];
+								binString[i] = charChange;
+								String test = new String(binString);
+								
+								if(reverseDFS.get(listIndex).equals(test)){
+									finalRemoveIndex = redundantIndex;
+								}
+							}
+						}
+						
+
+					}
+					for(int removeIndex = listIndex+1; removeIndex < finalRemoveIndex; removeIndex++){
+						reverseDFS.remove(listIndex+1);
+					}
+				}
+				reverseDFS.add(end);
+				reverseDFS.removeAll(Arrays.asList(null,""));
+				return reverseDFS;
+				
 			}
 			return ladderDFS;
 		}
@@ -200,6 +277,7 @@ public class Main {
 						
 						//Test for end
 						if(test.equals(end.toUpperCase())){
+							currentChain.removeAll(Arrays.asList(null,""));
 							return currentChain;
 						}
 						
