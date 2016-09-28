@@ -54,7 +54,7 @@ public class Main {
 		
 		initialize();
 		ArrayList<String> test = new ArrayList<String>();
-		test = getWordLadderDFS("SMART", "START");
+		test = getWordLadderDFS("HEALS", "QUEST");
 		test = getWordLadderBFS("QQQQQ", "QUEST");
 		test.size();
 		
@@ -102,6 +102,8 @@ public class Main {
 		char[] binString = new char[wordLength];
 		binString = start.toCharArray();
 		char replacedChar;
+		Set<String> nodeMatch = new HashSet<String>();
+		ArrayList<String> prioritySearch = new ArrayList<String>();
 		
 		//flagDFS represents if the end has been found
 		if(flagDFS == true){
@@ -117,6 +119,7 @@ public class Main {
 		
 		//Test for trivial case
 		if(start.equals(end)){
+			flagDFS = true;
 			ladderDFS.add(start);
 			return ladderDFS;
 		}
@@ -127,6 +130,7 @@ public class Main {
 		
 		//Generate List
 		while(true){
+			//Generate Nodes
 			for(int i = 0; i < wordLength; i++){
 				for(char charChange = 'A'; charChange <= 'Z'; charChange++ ){
 					
@@ -140,35 +144,56 @@ public class Main {
 					String test = new String(binString);
 					
 					if(dictDFS.contains(test) == true){
-						if(test.equals(end)){	
-							ladderDFS.add(0, test);
-							flagDFS = true;
-							return ladderDFS;
-						}
-						ladderDFS = (getWordLadderDFS(test, end));
-
-						if(flagDFS){
-							if(firstStringDFS.equals(start)){ // test for end of list
-								ladderDFS.add(test);
-								ladderDFS.add(start);
-								charChange = 'Z'+1;			 //exit for loops
-								i = wordLength;
-								break;
-							}
-							ladderDFS.add(test);
-							return (ladderDFS);
-						} 
-						else{
-							dictDFS.remove(test);	//remove dead node from dictionary
-						}
-						
+						nodeMatch.add(test);
 					}
 					binString[i] = replacedChar;	//Prepare binString for further modification
 				}
 			}
 			
+			//Order Nodes by priority
+			String[] nodeMatchArray = new String[nodeMatch.size()];
+			nodeMatchArray = nodeMatch.toArray(new String[wordLength]);
+			for(int nodeMatchIndex = nodeMatch.size() - 1; nodeMatchIndex >= 0; nodeMatchIndex--){
+				int charMatches = 0;
+					for (int k = 0; k < wordLength; k++) {
+						if (nodeMatchArray[nodeMatchIndex].charAt(k) == end.charAt(k)) {
+							charMatches++;
+						} 
+					}
+				nodeMatchArray[nodeMatchIndex] += charMatches;	
+			}
 			
+			//Generate priority List
+			for(char matchingChars =(char) (wordLength + 48); matchingChars >= '0'; matchingChars--){
+				for(int nodeMatchIndex = nodeMatch.size() - 1; nodeMatchIndex >= 0; nodeMatchIndex--){
+					if(nodeMatchArray[nodeMatchIndex].charAt(wordLength) == matchingChars){
+						prioritySearch.add(nodeMatchArray[nodeMatchIndex]);
+					}
+				}
+			}
 			
+						
+			for(int nodeMatchIndex = 0; nodeMatchIndex <= prioritySearch.size() - 1; nodeMatchIndex++){
+				if(prioritySearch.get(nodeMatchIndex).equals(end)){	
+					ladderDFS.add(0, prioritySearch.get(nodeMatchIndex));
+					flagDFS = true;
+					return ladderDFS;
+				}
+				ladderDFS = (getWordLadderDFS(prioritySearch.get(nodeMatchIndex).substring(0, 5), end));
+
+				if(flagDFS){
+					if(firstStringDFS.equals(start)){ // prioritySearch.get(nodeMatchIndex) for end of list
+						ladderDFS.add(prioritySearch.get(nodeMatchIndex).substring(0, 5));
+						ladderDFS.add(start);
+						break;
+					}
+					ladderDFS.add(prioritySearch.get(nodeMatchIndex).substring(0, 5));
+					return (ladderDFS);
+				} 
+				else{
+					dictDFS.remove(prioritySearch.get(nodeMatchIndex));	//remove dead node from dictionary
+				}
+			}
 			
 			if(flagDFS){    //Manage end of DFS
 				//Put list in proper order
