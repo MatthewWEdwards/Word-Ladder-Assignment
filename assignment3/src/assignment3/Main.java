@@ -28,9 +28,6 @@ import java.util.*;
 import java.io.*;
 
 public class Main {
-	
-	//testpush
-	private static boolean test;
 	private static boolean flagDFS;
 	private static boolean firstCallDFS;
 	private static String firstStringDFS;
