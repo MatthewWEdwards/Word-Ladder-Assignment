@@ -54,8 +54,8 @@ public class Main {
 		
 		initialize();
 		ArrayList<String> test = new ArrayList<String>();
-		test = getWordLadderDFS("PEACH", "FRAME");
-		test = getWordLadderBFS("PEACH", "FRAME");
+		test = getWordLadderDFS("SMART", "START");
+		test = getWordLadderBFS("QQQQQ", "QUEST");
 		test.size();
 		
 		// TODO methods to read in words, output ladder
@@ -170,16 +170,7 @@ public class Main {
 			
 			
 			
-			if(flagDFS){
-				//Manage end of DFS
-				
-				//Remove trailing nulls
-				int k = ladderDFS.size() - 1;
-				while(ladderDFS.get(k) == null){
-					ladderDFS.remove(k);
-					k--;
-				}
-				
+			if(flagDFS){    //Manage end of DFS
 				//Put list in proper order
 				ArrayList <String> reverseDFS = new ArrayList<String>();
 				for(int j = ladderDFS.size() - 1; j >= 0; j--){
@@ -187,38 +178,13 @@ public class Main {
 				}
 				
 				//remove redundant stuff from node list
-	
-				for(int listIndex = 0; listIndex < reverseDFS.size()-1; listIndex++){
-					int finalRemoveIndex = listIndex + 2;//This line prevents the remove loop from functioning if no remove index is found
-					for(int redundantIndex = listIndex + 1; redundantIndex < reverseDFS.size()-1; redundantIndex++){
-						for(int i = 0; i < wordLength; i++){
-							for(char charChange = 'A'; charChange <= 'Z'; charChange++ ){
-								
-								binString = reverseDFS.get(redundantIndex).toCharArray();
-								if(binString[i] == charChange){
-									continue;
-								}
-								
-								replacedChar = binString[i];
-								binString[i] = charChange;
-								String test = new String(binString);
-								
-								if(reverseDFS.get(listIndex).equals(test)){
-									finalRemoveIndex = redundantIndex;
-								}
-							}
-						}
-						
-
-					}
-					for(int removeIndex = listIndex+1; removeIndex < finalRemoveIndex; removeIndex++){
-						reverseDFS.remove(listIndex+1);
-					}
-				}
-				reverseDFS.add(end);
-				reverseDFS.removeAll(Arrays.asList(null,""));
+				removeRedundancies(reverseDFS);
+				reverseDFS.trimToSize();
 				return reverseDFS;
 				
+			}
+			if(start.equals(firstStringDFS)){
+				return null;
 			}
 			return ladderDFS;
 		}
@@ -253,9 +219,7 @@ public class Main {
 		while(nodeLists.size() > 0){
 			currentChain = nodeLists.remove(0); // pop nodeLists
 			binString = (currentChain.get(currentChain.size() - 1)).toUpperCase().toCharArray();
-			
-			//Remove items in current chain
-			//TODO: make this more efficient
+
 			for(int j = 0; j < currentChain.size(); j++){
 				dict.remove(currentChain.get(j));
 			}
@@ -277,7 +241,7 @@ public class Main {
 						
 						//Test for end
 						if(test.equals(end.toUpperCase())){
-							currentChain.removeAll(Arrays.asList(null,""));
+							currentChain.trimToSize();
 							return currentChain;
 						}
 						
@@ -292,21 +256,10 @@ public class Main {
 					
 				}
 			}
-			
-			//Remove analyzed node from dict
-			//TODO: analyze if this is redundent
-			String remove = new String(binString);
-			if(!dict.contains(remove)){
-				int temp = dict.size();
-				temp = temp + 0;
-			}
-			dict.remove(remove.toLowerCase());
-			
 
 		}
-		
 	
-		return null; // replace this line later with real return
+		return null; 
 	}
 
 	public static Set<String> makeDictionary() {
@@ -328,6 +281,58 @@ public class Main {
 
 	public static void printLadder(ArrayList<String> ladder) {
 
+	}
+	
+	private static void removeRedundancies(ArrayList<String> ladder){
+		char replacedChar;
+		char[] binString = new char[ladder.get(0).length()];
+		
+		
+		for(int listIndex = 0; listIndex < ladder.size()-1; listIndex++){
+			int finalRemoveIndex = listIndex + 2;//This line prevents the remove loop from functioning if no remove index is found
+			for(int redundantIndex = listIndex + 1; redundantIndex < ladder.size()-1; redundantIndex++){
+				for(int i = 0; i < wordLength; i++){
+					for(char charChange = 'A'; charChange <= 'Z'; charChange++ ){
+						
+						binString = ladder.get(redundantIndex).toCharArray();
+						if(binString[i] == charChange){
+							continue;
+						}
+						
+						replacedChar = binString[i];
+						binString[i] = charChange;
+						String test = new String(binString);
+						
+						if(ladder.get(listIndex).equals(test)){
+							finalRemoveIndex = redundantIndex;
+						}
+					}
+				}
+				
+
+			}
+			for(int removeIndex = listIndex+1; removeIndex < finalRemoveIndex; removeIndex++){
+				if(ladder.size() != listIndex+2){
+					ladder.remove(listIndex+1);
+				}
+			}
+			
+			char[] finalBinString = new char[ladder.get(0).length()];
+			finalBinString = ladder.get(ladder.size() - 2).toCharArray();
+			for(int i = 0; i < wordLength; i++){
+				for(char charChange = 'A'; charChange <= 'Z'; charChange++ ){
+					replacedChar = finalBinString[i];
+					finalBinString[i] = charChange;
+					String test = new String(finalBinString);
+					
+					if(test.equals(ladder.get(ladder.size()-1))){
+						ladder.remove(ladder.size()-2);
+					}
+					finalBinString[i] = replacedChar;
+				}
+
+			}
+		}
 	}
 	// TODO
 	// Other private static methods here
