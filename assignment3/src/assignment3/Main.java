@@ -54,8 +54,10 @@ public class Main {
 		
 		initialize();
 		ArrayList<String> test = new ArrayList<String>();
-		test = getWordLadderDFS("HEALS", "QUEST");
-		test = getWordLadderBFS("QQQQQ", "QUEST");
+		test = getWordLadderBFS("FLAGS", "CAGES");
+		test = getWordLadderBFS("CODES", "CAGES");
+		test = getWordLadderDFS("BREAK", "CAGES");
+		test = getWordLadderDFS("MONEY", "CAGES");
 		test.size();
 		
 		// TODO methods to read in words, output ladder
@@ -117,7 +119,7 @@ public class Main {
 		}
 		
 		
-		//Test for trivial case
+		//Test for recursion end-case
 		if(start.equals(end)){
 			flagDFS = true;
 			ladderDFS.add(start);
@@ -172,15 +174,18 @@ public class Main {
 				}
 			}
 			
-						
+			//Move on to next node, find end or call recursively
 			for(int nodeMatchIndex = 0; nodeMatchIndex <= prioritySearch.size() - 1; nodeMatchIndex++){
+				//Test for End
 				if(prioritySearch.get(nodeMatchIndex).equals(end)){	
 					ladderDFS.add(0, prioritySearch.get(nodeMatchIndex));
 					flagDFS = true;
 					return ladderDFS;
 				}
+				//Call recursively
 				ladderDFS = (getWordLadderDFS(prioritySearch.get(nodeMatchIndex).substring(0, 5), end));
 
+				//Handle returning from recursive calls if the end has been found
 				if(flagDFS){
 					if(firstStringDFS.equals(start)){ // prioritySearch.get(nodeMatchIndex) for end of list
 						ladderDFS.add(prioritySearch.get(nodeMatchIndex).substring(0, 5));
@@ -190,27 +195,34 @@ public class Main {
 					ladderDFS.add(prioritySearch.get(nodeMatchIndex).substring(0, 5));
 					return (ladderDFS);
 				} 
+				
+				//Handle returning from recursive calls if the end hasn't been found
 				else{
 					dictDFS.remove(prioritySearch.get(nodeMatchIndex));	//remove dead node from dictionary
 				}
 			}
 			
-			if(flagDFS){    //Manage end of DFS
+			//Manage end of DFS
+			if(flagDFS){    
 				//Put list in proper order
 				ArrayList <String> reverseDFS = new ArrayList<String>();
 				for(int j = ladderDFS.size() - 1; j >= 0; j--){
 					reverseDFS.add(ladderDFS.get(j));
 				}
 				
-				//remove redundant stuff from node list
+				//Remove redundant stuff from node list
 				removeRedundancies(reverseDFS);
 				reverseDFS.trimToSize();
+				firstCallDFS = true; // Prepare for next DFS call
 				return reverseDFS;
 				
 			}
+			//This if statement true we run out of places to search
 			if(start.equals(firstStringDFS)){
+				firstCallDFS = true; //Prepare for next DFS call
 				return null;
 			}
+			//Return from a dead end
 			return ladderDFS;
 		}
 
@@ -222,7 +234,8 @@ public class Main {
 		ArrayList <String> addChain = new ArrayList<String>(); // need to work on the use of this
 		ArrayList <ArrayList<String>> nodeLists = new ArrayList<ArrayList<String>>();
 		
-		//TODO: initialize ArrayLists to size = 0
+		//TODO: initialize ArrayLists to size = 0 (Do i really need to do this?)
+		//TODO: test to make sure BFS runs fast enough
 		
 		char[] binString = new char[wordLength];
 		char replacedChar;
