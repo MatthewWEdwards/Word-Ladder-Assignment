@@ -27,6 +27,10 @@ package assignment3;
 import java.util.*;
 import java.io.*;
 
+/**
+ * @author Matthew Edwards
+ *
+ */
 public class Main {
 	private static boolean flagDFS;
 	private static boolean firstCallDFS;
@@ -69,6 +73,9 @@ public class Main {
 		// TODO methods to read in words, output ladder
 	}
 
+	/**
+	 * 
+	 */
 	public static void initialize() {
 		// initialize your static variables or constants here.
 
@@ -97,6 +104,7 @@ public class Main {
 	 * 
 	 */
 
+
 	public static ArrayList<String> parse(Scanner keyboard) {
 		String hold;
 		int length = 0;
@@ -107,9 +115,9 @@ public class Main {
 		hold = keyboard.nextLine();
 		
 		
-		//Johnny's code
-		if (hold.equals("/quit")){
+		if (hold.contains("/quit")){
 			temp.clear();
+			System.exit(0);
 			return temp;
 		}
 		else{
@@ -138,6 +146,11 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * @param start
+	 * @param end
+	 * @return
+	 */
 	public static ArrayList<String> getWordLadderDFS(String start, String end) {
 		//The returned array is currently in reverse order.
 		//Also there are some trailing nulls strings for some reason
@@ -269,6 +282,11 @@ public class Main {
 		}
 	}
 
+	/**
+	 * @param start
+	 * @param end
+	 * @return
+	 */
 	public static ArrayList<String> getWordLadderBFS(String start, String end) {
 
 		ArrayList <String> currentChain = new ArrayList<String>();
@@ -341,6 +359,9 @@ public class Main {
 		return currentChain; 
 	}
 
+	/**
+	 * @return
+	 */
 	public static Set<String> makeDictionary() {
 
 		Set<String> words = new HashSet<String>();
@@ -358,7 +379,12 @@ public class Main {
 		return words;
 	}
 
-
+	/**
+	 * This function prints the ladder passed to if. If the ladder is empty, the 
+	 * function prints a statement, explaining that there is no word ladder between two
+	 * input words.
+	 * @param ladder
+	 */
 	public static void printLadder(ArrayList<String> ladder) {
 		int counter;
 		counter = 0; 
@@ -374,6 +400,14 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * This function removes certain redundancies in a word ladder. suppose we have a word ladder.
+	 * If position 1 and position 8 are one letter different from one another, 
+	 * then positions 2-7 are redundant in this word ladder. 
+	 * This function detects redundancies of this nature, and removes them.
+	 * 
+	 * @param ladder: the ladder to have its redundancies removed.
+	 */
 	private static void removeRedundancies(ArrayList<String> ladder){
 		char replacedChar;
 		char[] binString = new char[ladder.get(0).length()];
