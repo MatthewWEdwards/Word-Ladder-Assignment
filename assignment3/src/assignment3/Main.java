@@ -61,9 +61,8 @@ public class Main {
 
 		test = getWordLadderBFS("LOOPS", "FRUIT");
 		test = getWordLadderBFS("CREWS", "ABOUT");
-		test = getWordLadderBFS("JAZZY", "TRAMP");
-		test = getWordLadderBFS("ALOOF", "CLANK");
-		test = getWordLadderBFS("CODES", "CAGES");
+		test = getWordLadderDFS("ALOOF", "CLANK");
+		test = getWordLadderDFS("CODES", "CAGES");
 		test = getWordLadderBFS("BREAK", "CAGES");
 		test = getWordLadderBFS("MONEY", "CAGES");
 		test.size();
@@ -128,8 +127,8 @@ public class Main {
 			for (int l = index; hold.charAt(l) != 0; l++ ){
 				last = last + hold.charAt(l);
 			}
-			temp.add(first);
-			temp.add(last);
+			temp.add(first.toLowerCase());
+			temp.add(last.toUpperCase());
 			return temp;
 		}
 
@@ -252,7 +251,8 @@ public class Main {
 			//If this if statement is true, we have run out of places to search
 			if(start.equals(firstStringDFS)){
 				firstCallDFS = true; //Prepare for next DFS call
-				return null;
+				ladderDFS.clear();
+				return ladderDFS;
 			}
 			//Return from a dead end
 			return ladderDFS;
@@ -328,8 +328,8 @@ public class Main {
 			}
 
 		}
-	
-		return null; 
+		currentChain.clear();
+		return currentChain; 
 	}
 
 	public static Set<String> makeDictionary() {
