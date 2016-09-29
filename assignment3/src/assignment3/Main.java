@@ -54,8 +54,16 @@ public class Main {
 		
 		initialize();
 		ArrayList<String> test = new ArrayList<String>();
-		test = getWordLadderBFS("FLAGS", "CAGES");
-		test = getWordLadderBFS("CODES", "CAGES");
+		test = getWordLadderDFS("FLAGS", "CAGES");
+		test = getWordLadderDFS("CODES", "CAGES");
+		test = getWordLadderDFS("COOLS", "BUILD");
+		test = getWordLadderDFS("REACH", "CATCH");
+
+		test = getWordLadderDFS("LOOPS", "FRUIT");
+		test = getWordLadderDFS("CREWS", "ABOUT");
+		test = getWordLadderDFS("JAZZY", "TRAMP");
+		test = getWordLadderDFS("ALOOF", "CLANK");
+		test = getWordLadderDFS("CODES", "CAGES");
 		test = getWordLadderDFS("BREAK", "CAGES");
 		test = getWordLadderDFS("MONEY", "CAGES");
 		test.size();
@@ -113,6 +121,7 @@ public class Main {
 		}
 		
 		if(firstCallDFS == true){
+			ladderDFS.clear();
 			dictDFS = makeDictionary();
 			firstStringDFS = start;
 			firstCallDFS = false;
@@ -122,7 +131,6 @@ public class Main {
 		//Test for recursion end-case
 		if(start.equals(end)){
 			flagDFS = true;
-			ladderDFS.add(start);
 			return ladderDFS;
 		}
 		
@@ -176,12 +184,6 @@ public class Main {
 			
 			//Move on to next node, find end or call recursively
 			for(int nodeMatchIndex = 0; nodeMatchIndex <= prioritySearch.size() - 1; nodeMatchIndex++){
-				//Test for End
-				if(prioritySearch.get(nodeMatchIndex).equals(end)){	
-					ladderDFS.add(0, prioritySearch.get(nodeMatchIndex));
-					flagDFS = true;
-					return ladderDFS;
-				}
 				//Call recursively
 				ladderDFS = (getWordLadderDFS(prioritySearch.get(nodeMatchIndex).substring(0, 5), end));
 
@@ -217,7 +219,7 @@ public class Main {
 				return reverseDFS;
 				
 			}
-			//This if statement true we run out of places to search
+			//If this if statement is true, we have run out of places to search
 			if(start.equals(firstStringDFS)){
 				firstCallDFS = true; //Prepare for next DFS call
 				return null;
@@ -353,22 +355,6 @@ public class Main {
 				if(ladder.size() != listIndex+2){
 					ladder.remove(listIndex+1);
 				}
-			}
-			
-			char[] finalBinString = new char[ladder.get(0).length()];
-			finalBinString = ladder.get(ladder.size() - 2).toCharArray();
-			for(int i = 0; i < wordLength; i++){
-				for(char charChange = 'A'; charChange <= 'Z'; charChange++ ){
-					replacedChar = finalBinString[i];
-					finalBinString[i] = charChange;
-					String test = new String(finalBinString);
-					
-					if(test.equals(ladder.get(ladder.size()-1))){
-						ladder.remove(ladder.size()-2);
-					}
-					finalBinString[i] = replacedChar;
-				}
-
 			}
 		}
 	}
