@@ -2,22 +2,18 @@
  
 * EE422C Project 3 submission by
  
-* Replace <...> with your actual data.
+* Matthew Edwards
+* EID: mwe295
+* Unique Number: 16445
  
-* <Student1 Name>
- * <Student1 EID>
- 
-* <Student1 5-digit Unique No.>
- 
-* <Student2 Name>
- * <Student2 EID>
- 
-* <Student2 5-digit Unique No.>
- 
+* Johnny Rojas
+* EID: jr52483
+* Unique Number: 16445
+* 
 * Slip days used: <0>
  
-* Git URL:
- 
+* Git URL: https://github.com/MatthewWEdwards/EE442C_Project3.git
+* 
 * Fall 2016
  
 */
@@ -28,18 +24,21 @@ import java.util.*;
 import java.io.*;
 
 /**
+ * The BFS and DFS word ladder class.
+ * 
  * @author Matthew Edwards
- *
+ * @author JohnnyAngel Rojas
  */
 public class Main {
-	private static boolean flagDFS;
-	private static boolean firstCallDFS;
-	private static String firstStringDFS;
-	private static Set<String> dictDFS;
-	private static ArrayList<String> ladderDFS;
+	private static boolean flagDFS;//This flag is true when the end of a DFS is found
+	private static boolean firstCallDFS; //This flag is true between DFS calls, and is false during a DFS call. Its handled within the DFS
+	private static String firstStringDFS; // This string is used when returning from a successful DFS recursive call, to test if the top call is reached
+	private static Set<String> dictDFS;//dictDFS is used exclusively between recursive DFS calls
+	private static ArrayList<String> ladderDFS;//This is a ladder which can be called between recursive DFS calls
 	public static int wordLength; // length of words the world ladder is constructing from
-	private static String parseStart;
-	private static String parseEnd;
+	private static String parseStart; // This string is used if printLadder is sent an empty array, it tells DFS which ladder couldn't be found
+	private static String parseEnd; // This string is used if printLadder is sent an empty array, it tells DFS which ladder couldn't be found
+	private static boolean twoStackOverflows; // This flag tells the DFS if the searching the reverse heuristic failed by causing a stack overflow
 
 	public static void main(String[] args) throws Exception {
 		
@@ -74,37 +73,28 @@ public class Main {
 	}
 
 	/**
-	 * 
+	 * This method initializes static variables for the DFS and BFS methods
 	 */
 	public static void initialize() {
-		// initialize your static variables or constants here.
-
-		// We will call this method before running our JUNIT tests. So call it
-
-		// only once at the start of main.
 		
-		dictDFS = makeDictionary();
+		dictDFS = makeDictionary();	
 		ladderDFS = new ArrayList<String>();
-		flagDFS = false;
+		flagDFS = false; 
 		firstCallDFS = true;
-		firstStringDFS = null;
+		firstStringDFS = null; 
 		wordLength = 5;
 		parseStart = new String();
 		parseEnd = new String();
 	}
 
+
 	/**
+	 * This method takes the input words from the console, and puts them into
+	 * an array list. if "/quit" appears anywhere in the input, main terminates.
 	 * 
-	 * @param keyboard
-	 *            Scanner connected to System.in
-	 * 
-	 * @return ArrayList of 2 Strings containing start word and end word.
-	 * 
-	 *         If command is /quit, return empty ArrayList.
-	 * 
+	 * @param keyboard: The keyboard scanner.
+	 * @return: An array list containing two strings, start at index 0, and end at index 1.
 	 */
-
-
 	public static ArrayList<String> parse(Scanner keyboard) {
 		String hold;
 		int length = 0;
@@ -114,12 +104,13 @@ public class Main {
 		String last = "";
 		hold = keyboard.nextLine();
 		
-		
+		//Test for quit case
 		if (hold.contains("/quit")){
 			temp.clear();
 			System.exit(0);
 			return temp;
 		}
+		//Read input (assumed to be two 5 letter words which exist in the dictionary)
 		else{
 			for (int k = 0; hold.charAt(k) != ' '; k++ ){
 				first = first + hold.charAt(k);
@@ -147,9 +138,14 @@ public class Main {
 	}
 	
 	/**
-	 * @param start
-	 * @param end
-	 * @return
+	 * This method generates a word ladder, if one exists, between start and end.
+	 * This method uses a recursive DFS algorithm, with some heuristics to find the ladder faster.
+	 * This method catches stack overflow exceptions and handles them.
+	 * This method calls removeRedundancies() to reduce the size of the list it generates.
+	 * 
+	 * @param start: start of the potential word ladder
+	 * @param end: end of the potential word ladder
+	 * @return: an array list which contains the word ladder. Returns empty if no word ladder exists.
 	 */
 	public static ArrayList<String> getWordLadderDFS(String start, String end) {
 		//The returned array is currently in reverse order.
@@ -277,24 +273,30 @@ public class Main {
 			}
 		}
 		catch(final Exception stackOverflowError){
+			if(twoStackOverflows){
+				ladderDFS.clear();
+				twoStackOverflows = false;
+				return ladderDFS;
+			}
+			else{twoStackOverflows = true;}
 			return getWordLadderDFS(end, start);
 			
 		}
 	}
 
 	/**
-	 * @param start
-	 * @param end
-	 * @return
+	 * This method generates a word ladder, if one exists, between start and end.
+	 * This method uses an iterative BFS algorithm.
+	 * 
+	 * @param start: start of the potential word ladder
+	 * @param end: end of the potential word ladder
+	 * @return: an array list which contains the word ladder. Returns empty if no word ladder exists.
 	 */
 	public static ArrayList<String> getWordLadderBFS(String start, String end) {
 
 		ArrayList <String> currentChain = new ArrayList<String>();
-		ArrayList <String> addChain = new ArrayList<String>(); // need to work on the use of this
+		ArrayList <String> addChain = new ArrayList<String>(); 
 		ArrayList <ArrayList<String>> nodeLists = new ArrayList<ArrayList<String>>();
-		
-		//TODO: initialize ArrayLists to size = 0 (Do i really need to do this?)
-		//TODO: test to make sure BFS runs fast enough
 		
 		char[] binString = new char[wordLength];
 		char replacedChar;
@@ -307,12 +309,14 @@ public class Main {
 			return currentChain;
 		}
 		
-		//initialize nodeLists
+		//initialize nodeLists, handle the start string.
 		ArrayList <String> first = new ArrayList<String>();
 		first.add(start.toUpperCase());
 		nodeLists.add(first);
 		dict.remove(start);
 		
+		//nodeLists represents potential paths which lead to end. When it is empty, all potential
+		//paths have been exhausted.
 		while(nodeLists.size() > 0){
 			currentChain = nodeLists.remove(0); // pop nodeLists
 			binString = (currentChain.get(currentChain.size() - 1)).toUpperCase().toCharArray();
@@ -360,7 +364,10 @@ public class Main {
 	}
 
 	/**
-	 * @return
+	 * This method generates a set which represents a dictionary of words.
+	 * This method extracts these words from a text file.
+	 * 
+	 * @return: The dictionary set.
 	 */
 	public static Set<String> makeDictionary() {
 
@@ -383,7 +390,8 @@ public class Main {
 	 * This function prints the ladder passed to if. If the ladder is empty, the 
 	 * function prints a statement, explaining that there is no word ladder between two
 	 * input words.
-	 * @param ladder
+	 * 
+	 * @param ladder: The ladder to be printed. If this is empty, then print the no ladder statement.
 	 */
 	public static void printLadder(ArrayList<String> ladder) {
 		int counter;
@@ -401,7 +409,7 @@ public class Main {
 	}
 	
 	/**
-	 * This function removes certain redundancies in a word ladder. suppose we have a word ladder.
+	 * This method removes certain redundancies in a word ladder. suppose we have a word ladder.
 	 * If position 1 and position 8 are one letter different from one another, 
 	 * then positions 2-7 are redundant in this word ladder. 
 	 * This function detects redundancies of this nature, and removes them.
