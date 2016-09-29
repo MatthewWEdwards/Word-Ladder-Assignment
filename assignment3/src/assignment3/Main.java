@@ -54,18 +54,18 @@ public class Main {
 		
 		initialize();
 		ArrayList<String> test = new ArrayList<String>();
-		test = getWordLadderDFS("FLAGS", "CAGES");
-		test = getWordLadderDFS("CODES", "CAGES");
-		test = getWordLadderDFS("COOLS", "BUILD");
-		test = getWordLadderDFS("REACH", "CATCH");
+		test = getWordLadderBFS("FLAGS", "CAGES");
+		test = getWordLadderBFS("CODES", "CAGES");
+		test = getWordLadderBFS("COOLS", "BUILD");
+		test = getWordLadderBFS("REACH", "CATCH");
 
-		test = getWordLadderDFS("LOOPS", "FRUIT");
-		test = getWordLadderDFS("CREWS", "ABOUT");
-		test = getWordLadderDFS("JAZZY", "TRAMP");
-		test = getWordLadderDFS("ALOOF", "CLANK");
-		test = getWordLadderDFS("CODES", "CAGES");
-		test = getWordLadderDFS("BREAK", "CAGES");
-		test = getWordLadderDFS("MONEY", "CAGES");
+		test = getWordLadderBFS("LOOPS", "FRUIT");
+		test = getWordLadderBFS("CREWS", "ABOUT");
+		test = getWordLadderBFS("JAZZY", "TRAMP");
+		test = getWordLadderBFS("ALOOF", "CLANK");
+		test = getWordLadderBFS("CODES", "CAGES");
+		test = getWordLadderBFS("BREAK", "CAGES");
+		test = getWordLadderBFS("MONEY", "CAGES");
 		test.size();
 		
 		// TODO methods to read in words, output ladder
@@ -98,10 +98,40 @@ public class Main {
 	 */
 
 	public static ArrayList<String> parse(Scanner keyboard) {
-
-		// TO DO
-
-		return null;
+		String hold;
+		String read;
+		int index = 0;
+		ArrayList<String> temp = new ArrayList<String>();
+		String first = "";
+		String last = "";
+		hold = "";
+		read = keyboard.nextLine();
+		if (read.equals("/quit")){
+			temp.clear();
+			return temp;
+		}
+		else{
+			hold = keyboard.nextLine();
+			for (int k = 0; hold.charAt(k) != ' '; k++ ){
+				first = first + hold.charAt(k);
+				index = k;
+			}
+			index = index + 1;
+			while (true){
+				if ((hold.charAt(index) == ' ') || (hold.charAt(index) == '\t') || (hold.charAt(index) == '\n')){
+					index = index + 1;
+				}
+				else{
+					break;
+				}
+			}
+			for (int l = index; hold.charAt(l) != 0; l++ ){
+				last = last + hold.charAt(l);
+			}
+			temp.add(first);
+			temp.add(last);
+			return temp;
+		}
 
 	}
 
@@ -320,7 +350,12 @@ public class Main {
 	}
 
 	public static void printLadder(ArrayList<String> ladder) {
-
+		int counter;
+		counter = 0;
+		while (ladder.get(counter) != null){
+			System.out.println(ladder.get(counter));
+			counter = counter + 1;
+		}
 	}
 	
 	private static void removeRedundancies(ArrayList<String> ladder){
