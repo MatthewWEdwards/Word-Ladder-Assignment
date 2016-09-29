@@ -34,6 +34,8 @@ public class Main {
 	private static Set<String> dictDFS;
 	private static ArrayList<String> ladderDFS;
 	public static int wordLength; // length of words the world ladder is constructing from
+	private static String parseStart;
+	private static String parseEnd;
 
 	public static void main(String[] args) throws Exception {
 		
@@ -54,18 +56,15 @@ public class Main {
 		
 		initialize();
 		ArrayList<String> test = new ArrayList<String>();
-		test = getWordLadderBFS("FLAGS", "CAGES");
-		test = getWordLadderBFS("CODES", "CAGES");
-		test = getWordLadderBFS("COOLS", "BUILD");
-		test = getWordLadderBFS("REACH", "CATCH");
-
-		test = getWordLadderBFS("LOOPS", "FRUIT");
-		test = getWordLadderBFS("CREWS", "ABOUT");
-		test = getWordLadderDFS("ALOOF", "CLANK");
-		test = getWordLadderDFS("CODES", "CAGES");
-		test = getWordLadderBFS("BREAK", "CAGES");
-		test = getWordLadderBFS("MONEY", "CAGES");
-		test.size();
+		ArrayList<String> input = new ArrayList<String>();
+		initialize();
+		while(true){
+			input = parse(kb);
+			test = getWordLadderDFS(input.get(0), input.get(1));
+			printLadder(test);
+			test = getWordLadderBFS(input.get(0), input.get(1));
+			printLadder(test);
+		}
 		
 		// TODO methods to read in words, output ladder
 	}
@@ -83,6 +82,8 @@ public class Main {
 		firstCallDFS = true;
 		firstStringDFS = null;
 		wordLength = 5;
+		parseStart = new String();
+		parseEnd = new String();
 	}
 
 	/**
@@ -98,24 +99,26 @@ public class Main {
 
 	public static ArrayList<String> parse(Scanner keyboard) {
 		String hold;
-		String read;
+		int length = 0;
 		int index = 0;
 		ArrayList<String> temp = new ArrayList<String>();
 		String first = "";
 		String last = "";
-		hold = "";
-		read = keyboard.nextLine();
-		if (read.equals("/quit")){
+		hold = keyboard.nextLine();
+		
+		
+		//Johnny's code
+		if (hold.equals("/quit")){
 			temp.clear();
 			return temp;
 		}
 		else{
-			hold = keyboard.nextLine();
 			for (int k = 0; hold.charAt(k) != ' '; k++ ){
 				first = first + hold.charAt(k);
 				index = k;
 			}
 			index = index + 1;
+			length = index;
 			while (true){
 				if ((hold.charAt(index) == ' ') || (hold.charAt(index) == '\t') || (hold.charAt(index) == '\n')){
 					index = index + 1;
@@ -124,16 +127,17 @@ public class Main {
 					break;
 				}
 			}
-			for (int l = index; hold.charAt(l) != 0; l++ ){
+			for (int l = index; l < index + length; l++ ){
 				last = last + hold.charAt(l);
 			}
 			temp.add(first.toUpperCase());
+			parseStart = first.toLowerCase();
 			temp.add(last.toUpperCase());
+			parseEnd = last.toLowerCase();
 			return temp;
 		}
-
 	}
-
+	
 	public static ArrayList<String> getWordLadderDFS(String start, String end) {
 		//The returned array is currently in reverse order.
 		//Also there are some trailing nulls strings for some reason
@@ -144,120 +148,125 @@ public class Main {
 		Set<String> nodeMatch = new HashSet<String>();
 		ArrayList<String> prioritySearch = new ArrayList<String>();
 		
-		//flagDFS represents if the end has been found
-		if(flagDFS == true){
-			flagDFS = false;
-		}
-		
-		if(firstCallDFS == true){
-			ladderDFS.clear();
-			dictDFS = makeDictionary();
-			firstStringDFS = start;
-			firstCallDFS = false;
-		}
-		
-		
-		//Test for recursion end-case
-		if(start.equals(end)){
-			flagDFS = true;
-			return ladderDFS;
-		}
-		
-		
-		//Remove current string from dictionary
-		dictDFS.remove(start);
-		
-		//Generate List
-		while(true){
-			//Generate Nodes
-			for(int i = 0; i < wordLength; i++){
-				for(char charChange = 'A'; charChange <= 'Z'; charChange++ ){
-					
-					//test for the case when iterating when binString is not changed
-					if(binString[i] == charChange){
-						continue;
-					}
-					
-					replacedChar = binString[i];
-					binString[i] = charChange;
-					String test = new String(binString);
-					
-					if(dictDFS.contains(test) == true){
-						nodeMatch.add(test);
-					}
-					binString[i] = replacedChar;	//Prepare binString for further modification
-				}
+		try{
+			//flagDFS represents if the end has been found
+			if(flagDFS == true){
+				flagDFS = false;
 			}
 			
-			//Order Nodes by priority
-			String[] nodeMatchArray = new String[nodeMatch.size()];
-			nodeMatchArray = nodeMatch.toArray(new String[wordLength]);
-			for(int nodeMatchIndex = nodeMatch.size() - 1; nodeMatchIndex >= 0; nodeMatchIndex--){
-				int charMatches = 0;
-					for (int k = 0; k < wordLength; k++) {
-						if (nodeMatchArray[nodeMatchIndex].charAt(k) == end.charAt(k)) {
-							charMatches++;
-						} 
-					}
-				nodeMatchArray[nodeMatchIndex] += charMatches;	
-			}
-			
-			//Generate priority List
-			for(char matchingChars =(char) (wordLength + 48); matchingChars >= '0'; matchingChars--){
-				for(int nodeMatchIndex = nodeMatch.size() - 1; nodeMatchIndex >= 0; nodeMatchIndex--){
-					if(nodeMatchArray[nodeMatchIndex].charAt(wordLength) == matchingChars){
-						prioritySearch.add(nodeMatchArray[nodeMatchIndex]);
-					}
-				}
-			}
-			
-			//Move on to next node, find end or call recursively
-			for(int nodeMatchIndex = 0; nodeMatchIndex <= prioritySearch.size() - 1; nodeMatchIndex++){
-				//Call recursively
-				ladderDFS = (getWordLadderDFS(prioritySearch.get(nodeMatchIndex).substring(0, 5), end));
-
-				//Handle returning from recursive calls if the end has been found
-				if(flagDFS){
-					if(firstStringDFS.equals(start)){ // prioritySearch.get(nodeMatchIndex) for end of list
-						ladderDFS.add(prioritySearch.get(nodeMatchIndex).substring(0, 5));
-						ladderDFS.add(start);
-						break;
-					}
-					ladderDFS.add(prioritySearch.get(nodeMatchIndex).substring(0, 5));
-					return (ladderDFS);
-				} 
-				
-				//Handle returning from recursive calls if the end hasn't been found
-				else{
-					dictDFS.remove(prioritySearch.get(nodeMatchIndex));	//remove dead node from dictionary
-				}
-			}
-			
-			//Manage end of DFS
-			if(flagDFS){    
-				//Put list in proper order
-				ArrayList <String> reverseDFS = new ArrayList<String>();
-				for(int j = ladderDFS.size() - 1; j >= 0; j--){
-					reverseDFS.add(ladderDFS.get(j));
-				}
-				
-				//Remove redundant stuff from node list
-				removeRedundancies(reverseDFS);
-				reverseDFS.trimToSize();
-				firstCallDFS = true; // Prepare for next DFS call
-				return reverseDFS;
-				
-			}
-			//If this if statement is true, we have run out of places to search
-			if(start.equals(firstStringDFS)){
-				firstCallDFS = true; //Prepare for next DFS call
+			if(firstCallDFS == true){
 				ladderDFS.clear();
+				dictDFS = makeDictionary();
+				firstStringDFS = start;
+				firstCallDFS = false;
+			}
+			
+			
+			//Test for recursion end-case
+			if(start.equals(end)){
+				flagDFS = true;
 				return ladderDFS;
 			}
-			//Return from a dead end
-			return ladderDFS;
+			
+			
+			//Remove current string from dictionary
+			dictDFS.remove(start);
+			
+			//Generate List
+			while(true){
+				//Generate Nodes
+				for(int i = 0; i < wordLength; i++){
+					for(char charChange = 'A'; charChange <= 'Z'; charChange++ ){
+						
+						//test for the case when iterating when binString is not changed
+						if(binString[i] == charChange){
+							continue;
+						}
+						
+						replacedChar = binString[i];
+						binString[i] = charChange;
+						String test = new String(binString);
+						
+						if(dictDFS.contains(test) == true){
+							nodeMatch.add(test);
+						}
+						binString[i] = replacedChar;	//Prepare binString for further modification
+					}
+				}
+				
+				//Order Nodes by priority
+				String[] nodeMatchArray = new String[nodeMatch.size()];
+				nodeMatchArray = nodeMatch.toArray(new String[wordLength]);
+				for(int nodeMatchIndex = nodeMatch.size() - 1; nodeMatchIndex >= 0; nodeMatchIndex--){
+					int charMatches = 0;
+						for (int k = 0; k < wordLength; k++) {
+							if (nodeMatchArray[nodeMatchIndex].charAt(k) == end.charAt(k)) {
+								charMatches++;
+							} 
+						}
+					nodeMatchArray[nodeMatchIndex] += charMatches;	
+				}
+				
+				//Generate priority List
+				for(char matchingChars =(char) (wordLength + 48); matchingChars >= '0'; matchingChars--){
+					for(int nodeMatchIndex = nodeMatch.size() - 1; nodeMatchIndex >= 0; nodeMatchIndex--){
+						if(nodeMatchArray[nodeMatchIndex].charAt(wordLength) == matchingChars){
+							prioritySearch.add(nodeMatchArray[nodeMatchIndex]);
+						}
+					}
+				}
+				
+				//Move on to next node, find end or call recursively
+				for(int nodeMatchIndex = 0; nodeMatchIndex <= prioritySearch.size() - 1; nodeMatchIndex++){
+					//Call recursively
+					ladderDFS = (getWordLadderDFS(prioritySearch.get(nodeMatchIndex).substring(0, 5), end));
+	
+					//Handle returning from recursive calls if the end has been found
+					if(flagDFS){
+						if(firstStringDFS.equals(start)){ // prioritySearch.get(nodeMatchIndex) for end of list
+							ladderDFS.add(prioritySearch.get(nodeMatchIndex).substring(0, 5));
+							ladderDFS.add(start);
+							break;
+						}
+						ladderDFS.add(prioritySearch.get(nodeMatchIndex).substring(0, 5));
+						return (ladderDFS);
+					} 
+					
+					//Handle returning from recursive calls if the end hasn't been found
+					else{
+						dictDFS.remove(prioritySearch.get(nodeMatchIndex));	//remove dead node from dictionary
+					}
+				}
+				
+				//Manage end of DFS
+				if(flagDFS){    
+					//Put list in proper order
+					ArrayList <String> reverseDFS = new ArrayList<String>();
+					for(int j = ladderDFS.size() - 1; j >= 0; j--){
+						reverseDFS.add(ladderDFS.get(j));
+					}
+					
+					//Remove redundant stuff from node list
+					removeRedundancies(reverseDFS);
+					reverseDFS.trimToSize();
+					firstCallDFS = true; // Prepare for next DFS call
+					return reverseDFS;
+					
+				}
+				//If this if statement is true, we have run out of places to search
+				if(start.equals(firstStringDFS)){
+					firstCallDFS = true; //Prepare for next DFS call
+					ladderDFS.clear();
+					return ladderDFS;
+				}
+				//Return from a dead end
+				return ladderDFS;
+			}
 		}
-
+		catch(final Exception stackOverflowError){
+			return getWordLadderDFS(end, start);
+			
+		}
 	}
 
 	public static ArrayList<String> getWordLadderBFS(String start, String end) {
@@ -349,11 +358,18 @@ public class Main {
 		return words;
 	}
 
+
 	public static void printLadder(ArrayList<String> ladder) {
 		int counter;
-		counter = 0;
-		while (ladder.get(counter) != null){
-			System.out.println(ladder.get(counter));
+		counter = 0; 
+		if(ladder.size() == 0){
+			System.out.println("no word ladder can be found between " + parseStart +  " and " + parseEnd + ".\n");
+			return;
+		}
+		System.out.println("");
+		System.out.println("a " + (ladder.size() - 2) + "-rung word ladder exists between " + ladder.get(0).toLowerCase() + " and " + ladder.get(ladder.size() - 1).toLowerCase() + ".");
+		while (counter < ladder.size()){
+			System.out.println((ladder.get(counter)).toLowerCase());
 			counter = counter + 1;
 		}
 	}
