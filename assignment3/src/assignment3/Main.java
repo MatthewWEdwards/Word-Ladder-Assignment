@@ -74,13 +74,46 @@ public class Main {
 		ArrayList<String> test = new ArrayList<String>();
 		ArrayList<String> input = new ArrayList<String>();
 		initialize();
-		while (true) {
+		
+		test = getWordLadderDFS("CAGES", "PARTS");
+		printLadder(test);
+		test = getWordLadderBFS("CAGES", "PARTS");
+		printLadder(test);
+		test = getWordLadderDFS("ALOOF", "MARKS");
+		printLadder(test);
+		test = getWordLadderBFS("ALOOF", "MARKS");
+		printLadder(test);
+		test = getWordLadderDFS("JOKES", "JAZZY");
+		printLadder(test);
+		test = getWordLadderBFS("JOKES", "JAZZY");
+		printLadder(test);
+		test = getWordLadderDFS("ALOOF", "ACTOR");
+		printLadder(test);
+		test = getWordLadderBFS("ALOOF", "ACTOR");
+		printLadder(test);
+		test = getWordLadderDFS("COOKS", "FRANK");
+		printLadder(test);
+		test = getWordLadderBFS("COOKS", "FRANK");
+		printLadder(test);
+		test = getWordLadderDFS("CAGES", "PARTS");
+		printLadder(test);
+		test = getWordLadderBFS("CAGES", "PARTS");
+		printLadder(test);
+		
+		
+		
+		
+		
+		
+		
+		
+		/*while (true) {
 			input = parse(kb);
 			test = getWordLadderDFS(input.get(0), input.get(1));
 			printLadder(test);
 			test = getWordLadderBFS(input.get(0), input.get(1));
 			printLadder(test);
-		}
+		}*/
 
 		// TODO methods to read in words, output ladder
 	}
@@ -186,6 +219,8 @@ public class Main {
 				dictDFS = makeDictionary();
 				firstStringDFS = start;
 				firstCallDFS = false;
+				parseStart = start;
+				parseEnd = end;
 			}
 
 			// Test for recursion end-case
@@ -294,7 +329,7 @@ public class Main {
 				// Return from a dead end
 				return ladderDFS;
 			}
-		} catch (final Exception stackOverflowError) {
+		} catch (final Error StackOverflowError) {
 			if (twoStackOverflows) {
 				ladderDFS.clear();
 				twoStackOverflows = false;
@@ -327,6 +362,9 @@ public class Main {
 		char[] binString = new char[wordLength];
 		char replacedChar;
 
+		parseStart = start;
+		parseEnd = end;
+		
 		// Generate dictionary
 		Set<String> dict = makeDictionary();
 
