@@ -186,8 +186,8 @@ public class Main {
 				dictDFS = makeDictionary();
 				firstStringDFS = start;
 				firstCallDFS = false;
-				parseStart = start;
-				parseEnd = end;
+				parseStart = start.toLowerCase();
+				parseEnd = end.toLowerCase();
 			}
 
 			// Test for recursion end-case
@@ -329,8 +329,8 @@ public class Main {
 		char[] binString = new char[wordLength];
 		char replacedChar;
 
-		parseStart = start;
-		parseEnd = end;
+		parseStart = start.toLowerCase();
+		parseEnd = end.toLowerCase();
 		
 		// Generate dictionary
 		Set<String> dict = makeDictionary();
