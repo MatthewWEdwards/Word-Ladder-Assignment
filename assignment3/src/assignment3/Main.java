@@ -127,12 +127,17 @@ public class Main {
 		// Read input 
 		//(assumed to be two 5 letter words which exist in the dictionary)
 		else {
-			for (int k = 0; hold.charAt(k) != ' '; k++) {
+			int k = 0;
+			while(hold.charAt(k) == '\t' || hold.charAt(k) == '\n' ||  hold.charAt(k) == ' '){
+				k++;
+			}
+			while( hold.charAt(k) != ' ') {
 				first = first + hold.charAt(k);
 				index = k;
+				k++;
 			}
 			index = index + 1;
-			length = index;
+			length = wordLength;
 			while (true) {
 				if ((hold.charAt(index) == ' ') || (hold.charAt(index) == '\t') || (hold.charAt(index) == '\n')) {
 					index = index + 1;
